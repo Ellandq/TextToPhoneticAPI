@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewrite Function Demo</title>
+</head>
+<body>
+
+    <script type="module">
+        import format_AS from './formats/AS.js';
+        import format_IPA from './formats/IPA.js';
+        import letters from './formats/alfabet.js';
+        
+        const alphabet = letters.all;
+        const vowelsArray = letters.vowels;
+        const consonantsArray = alphabet.filter(
+            (letter) => !vowelsArray.includes(letter)
+        );
+        const voicelessArray = letters.voiceless;
+
+        export function sonority(word, a, b) {
+            consonantsArray.some((con1) => {
+                consonantsArray.some((con2) => {
+                    if (word.includes(con1 + a + con2))
+                        word = word.replace(con1 + a + con2, con1 + b + con2);
+                });
+                if (word.endsWith(con1 + a)) word = word.replace(con1 + a, con1 + b);
+            });
+
+            return word;
+        }
+
+        export function updateAlphabet(array, key, value) {
+            if (array.includes(key) && !array.includes(value)) array.push(value);
+        }
+
+        export function makeSofter(word, array, softer) {
+            let position = 0;
+            const x = word.split("");
+            for (let i = 0; i < x.length; i++) {
+                if (Object.keys(softer).includes(x[i])) {
+                    position = i;
+                    break;
+                }
+            }
+
+            const forDeletion = ["g", "h", "k"];
+            const newSofts = array.filter((x) => !forDeletion.includes(x));
+
+            newSofts.some((soft1) => {
+                newSofts.some((soft2) => {
+                    if (
+                        (x[position - 2] + x[position - 1] === soft1 ||
+                            x[position - 1] === soft1) &&
+                        (x[position + 1] === soft2 ||
+                            x[position + 1] + x[position + 2] === soft2)
+                    ) {
+                        Object.keys(softer).forEach((key) => {
+                            word = word.replace(
+                                soft1 + key + soft2,
+                                soft1 + softer[key]
+                            );
+                        });
+                    }
+                });
+            });
+
+            return word;
+        }
+
+        export function vowelsAccent(word, a, b) {
+            word = word.replace(a + "m", b + "m");
+            word = word.replace(a + "n", b + "n");
+            word = word.replace(a + "ŋ", b + "ŋ");
+            word = word.replace(a + "ń", b + "ń");
+            word = word.replace(a + "ɲ", b + "ɲ");
+            word = word.replace(a + "j̃", b + "j̃");
+            word = word.replace(a + "ĩ ̯", b + "ĩ ̯");
+
+            return word;
+        }
+
+        export function specialSofter(word, a, b) {
+            voicelessArray.some((voiceless) => {
+                word = word.replace(a + voiceless, b + voiceless);
+            });
+
+            if (word.endsWith(a)) word = word.replace(a, b);
+
+            return word;
+        }
+
+        export function reduceRepeat(word) {
+            const splitted = word.split("");
+
+            for (let i = 0; i < splitted.length; i++) {
+                if (splitted[i] === splitted[i - 1]) splitted[i] = "•";
+            }
+
+            word = splitted.join("");
+            return word;
+        }
+
+        export default function rewrite(input) {
+            const words = input.toLowerCase().split(/[" "|"\n"|","|-]/g);
+
+            const results = new Array();
+            words.forEach((word) => {
+                const AS = format_AS(word);
+                const IPA = format_IPA(word);
+                results.push(`[${AS}] [${IPA}]`);
+            });
+            return results;
+        }
+
+        document.getElementById('rewriteButton').addEventListener('click', () => {  
+            const inputText = document.getElementById('inputText').value;  
+            const result = rewrite(inputText);  
+            document.getElementById('outputText').innerText = result.join(' ');  
+        });  
+    </script>
+
+    <h1>Rewrite Function Demo</h1>
+    <label for="inputText">Enter text:</label>
+    <input type="text" id="inputText" />
+    <button id="rewriteButton">Rewrite</button>
+    <p id="outputText"></p>
+</body>
+</html>
