@@ -82,7 +82,7 @@ export function reduceRepeat(word) {
 }
 // zwracanie obiektu z danymi
 export default function rewrite(input) {
-    const words = input.toLowerCase().split(/[" "|"\n"]/g);
+    const words = input.toLowerCase().split(/[\s\n,-]+/g);
     const results = {
         AS: "",
         IPA: ""
