@@ -1,3 +1,6 @@
+using TextToPhoneticAPI;
+
+
 namespace TextToPhoneticAPI_Test;
 
 public class Tests
@@ -8,8 +11,8 @@ public class Tests
     }
 
     [Test]
-    public void Test1()
+    public void Test()
     {
-        Assert.Pass();
+        
     }
 }
